@@ -11,17 +11,18 @@ def display_title():
 
 def display_menu():
     print(Fore.LIGHTCYAN_EX +
-          "Menu:\n"
-          "1. List movies\n"
-          "2. Add movie\n"
-          "3. Delete movie\n"
-          "4. Update movie\n"
-          "5. Stats\n"
-          "6. Random movie\n"
-          "7. Search movie\n"
-          "8. Movies sorted by rating\n"
-          "9. Create Rating Histogram\n"
-          )
+          """
+Menu:
+1. List movies
+2. Add movie
+3. Delete movie
+4. Update movie
+5. Stats
+6. Random movie
+7. Search movie
+8. Movies sorted by rating
+9. Create Rating Histogram
+        """)
 
 
 def get_user_input():
@@ -179,13 +180,10 @@ def main():
     display_menu()
     user_input = get_user_input()
     exit_app = False
-
     while not exit_app:
-
         # Exits movie app if user enters number outside the range: 1-10
         if user_input not in range(10):
             exit_app = True
-
         else:
             # Dispatch Table from Menu
             user_choice = {
