@@ -1,23 +1,36 @@
-import json
+import requests
 
 NEW_ANIMALS_DATA_HTML = 'animals.html'
 ANIMALS_DATA_HTML = 'animals_template.html'
 ANIMALS_DATA_JSON = 'animals_data.json'
+API_KEY = 'PWX0kgVn0wVUz5uMdQ5RcA==jpQKyNFSCzKizpbz'
+REQUEST_URL = f'https://api.api-ninjas.com/v1/animals?name='
+HEADERS = {'X-Api-Key': API_KEY}
 
 
-def load_data(filepath):
-    """ LOADS JSON FILE"""
-    with open(filepath, 'r') as handle:
-        return json.load(handle)
+def get_user_input():
+    """ PROMPTS USER FOR INPUT"""
+    animal_name = input("Enter a name for an animal: ")
+    return animal_name.strip()
+
+
+def request_api_data(animal_name):
+    """ GETS NAME OF ANIMAL, SENDS REQUESTS ANIMAL API AND RETURNS THE DATA"""
+    api_url = REQUEST_URL + animal_name
+    response = requests.get(api_url, headers=HEADERS)
+    return response.json()
 
 
 def process_animal_data(animal_data):
     """GETS ANIMAL DATA AND RETURNS LIST OF DICTIONARIES OF ANIMAL INFO
     [{'NAME':...}, {'LOCATION':...}, ...]"""
-    animals_data_processed = []
+    # RETURNS NONE IF ANIMAL NOT FOUND IN API
+    if not animal_data:
+        return None
 
+    animals_data_processed = []
     for index in range(len(animal_data)):
-        animal_type = animal_diet = False # INITIALIZING BOTH VARIABLES TO FALSE
+        animal_type = animal_diet = False  # INITIALIZING BOTH VARIABLES TO FALSE
 
         animal_name = animal_data[index]['name']
         animal_location = animal_data[index]['locations'][0]
@@ -45,21 +58,25 @@ def process_animal_data(animal_data):
     return animals_data_processed
 
 
-def serialize_animal_data(animal_data):
+def serialize_animal_data(animal_data, animal_name):
     """GETS ANIMAL DATA AND RETURNS A SERIALIZED OUTPUT FOR HTML"""
     output = '<li class="cards__item">'
-    for animal in animal_data:
-        for animal_detail in animal:
-            if animal_detail == 'Name':
-                output += f"\n<div class = 'card__title' >" \
-                          f"{animal[animal_detail]}</div>\n"
-            else:
-                output += f"<p class = 'card__text'><strong" \
-                          f">{animal_detail}:</strong>" \
-                          f" {animal[animal_detail]}</p>\n"
-
-        output += '</li>\n\n<li class="cards__item">'
-    return output
+    if animal_data is None:
+        output += f"\n  <h2>The animal \"{animal_name}\" doesn't exist.</h2>"
+    else:
+        for animal in animal_data:
+            for animal_detail in animal:
+                if animal_detail == 'Name':
+                    output += f"\n<div class = 'card__title' >" \
+                              f"{animal[animal_detail]}</div>\n"
+                else:
+                    output += f"<p class = 'card__text'><strong" \
+                              f">{animal_detail}:</strong>" \
+                              f" {animal[animal_detail]}</p>\n"
+            output += '</li>\n\n<li class="cards__item">'
+    # REMOVES OPENING Li TAG TO PREVENT CREATING AN EMPTY CARD
+    if output.endswith('<li class="cards__item">'):
+        return output.removesuffix('\n<li class="cards__item">')
 
 
 def read_html_file(filepath):
@@ -79,16 +96,18 @@ def write_to_html_file(filepath, new_content):
     """WRITES NEW CONTENT TO NEW HTML FILE"""
     with open(filepath, 'w') as f:
         f.write(new_content)
+        print(f'Website was successfully generated to the file {filepath}')
 
 
 def main():
     """MAIN: CALLS OTHER FUNCTIONS"""
+    animal_name = get_user_input()
     # LOAD DATA FROM JSON FILE
-    animal_data = load_data(ANIMALS_DATA_JSON)
+    animal_data = request_api_data(animal_name)
     # PROCESS DATA FOR SERIALIZATION
     animal_data_processed = process_animal_data(animal_data)
     # SERIALIZE DATA
-    new_content = serialize_animal_data(animal_data_processed)
+    new_content = serialize_animal_data(animal_data_processed, animal_name)
     # READ HTML CONTENT FROM HTML FILE
     html_file = read_html_file(ANIMALS_DATA_HTML)
     # REPLACE HTML CONTENT WITH SERIALIZED DATA
