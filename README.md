@@ -1,4 +1,4 @@
-﻿# Living in a Movie
+﻿# Mini Movie App
 
 ## Description
 A movie application that stores movie names and their ratings and communicates 
