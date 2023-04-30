@@ -2,7 +2,6 @@ from data_fetcher import fetch_data
 
 NEW_ANIMALS_DATA_HTML = 'animals.html'
 ANIMALS_DATA_HTML = 'animals_template.html'
-ANIMALS_DATA_JSON = 'animals_data.json'
 
 
 def get_user_input():
